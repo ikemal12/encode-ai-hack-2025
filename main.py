@@ -64,19 +64,20 @@ def submit():
         }
         save_to_csv(financial_data)
 
-        # AI prompt
+        # Shorter AI prompt
         prompt = f"""
-        A person has:
+        Calculate these financial metrics for someone with:
         - Salary: ${salary}
         - Debt: ${debt}
         - Savings: ${savings}
 
-        Calculate their:
-        1. Debt-to-Income Ratio (DTI)
-        2. Savings Rate
-        3. Net Worth
+        1. Debt-to-Income Ratio (monthly debt payments/monthly income)
+        2. Savings Rate (savings/income)
+        3. Net Worth (savings - debt)
 
-        Then provide a short paragraph interpreting these values and giving practical suggestions to improve their financial situation.
+        Then provide 2-3 practical suggestions to improve their finances.
+        Your answer will be used purely as output on a website for analysis therefore do not answer
+        regarding me.
         """
 
         # Configure Gemini
@@ -87,13 +88,25 @@ def submit():
         )
 
         portia = Portia(config=config, tools=[])  # No search tools
-        plan_run = portia.run(prompt)
-        result = plan_run.outputs.final_output.value
+        
+        try:
+            plan_run = portia.run(prompt)
+            result = plan_run.outputs.final_output.value
+        except Exception as e:
+            # Fallback calculations if API fails
+            dti = round((debt/salary)*100, 2) if salary else 0
+            savings_rate = round((savings/salary)*100, 2) if salary else 0
+            net_worth = savings - debt
+            result = f"Could not generate AI analysis due to API limits. Basic calculations:\n\n" \
+                     f"1. Debt-to-Income: {dti}%\n" \
+                     f"2. Savings Rate: {savings_rate}%\n" \
+                     f"3. Net Worth: ${net_worth}\n\n" \
+                     f"Suggestions: 1) Pay down high-interest debt first 2) Build emergency fund 3) Increase income streams"
 
         if isinstance(result, list):
             result = " ".join(result)
 
-        formatted_result = "<p>" + result.replace('. ', '.</p><p>') + "</p>"
+        formatted_result = "<p>" + result.replace('\n', '</p><p>') + "</p>"
 
         with open("output.txt", "a") as f:
             f.write(f"User {user_number} analysis:\n{result}\n\n")
@@ -104,9 +117,9 @@ def submit():
                 <p><strong>Salary:</strong> ${salary}</p>
                 <p><strong>Debt:</strong> ${debt}</p>
                 <p><strong>Savings:</strong> ${savings}</p>
-                <p><strong>AI-generated analysis:</strong></p>
+                <p><strong>Analysis:</strong></p>
                 <div style="background-color: #f1f1f1; padding: 10px; border-radius: 5px;">{formatted_result}</div>
-                <p>Results appended to files.</p>
+                <p>Results saved to files.</p>
                 <a href="/" style="display: inline-block; margin-top: 20px; padding: 10px; background: #4CAF50; color: white; text-decoration: none;">Submit Another</a>
             </div>
         """
