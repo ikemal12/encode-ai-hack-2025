@@ -61,6 +61,7 @@ Okay, I will analyze the financial data provided:
 
 The individual appears to have a relatively low debt burden. However, the savings are also very low. A more comprehensive analysis requires knowing the timeframe for the salary (monthly/annually), and understanding the nature of the debt and savings (e.g., type of debt, savings goals). Ideally, further context would be required on other income, expenses and assets.
 
+<<<<<<< HEAD
 User 11 analysis:
 Tool search_tool failed: Error: ToolHardError('TAVILY_API_KEY is required to use search')
  Please fix your mistakes.
@@ -111,4 +112,35 @@ Based on a DTI of 120%, a savings rate of 2%, and a net worth of -$4000, this in
 User 25 analysis:
 Tool llm_tool failed after retries: Error: ToolSoftError(ResourceExhausted('You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.'))
  Please fix your mistakes.
+=======
+User 1 analysis:
+2222.0
+
+User 2 analysis:
+Okay, I will analyze the provided financial data:
+
+*   **Salary:** £88 - This appears to be a weekly or monthly salary, as it's a very low annual salary.
+*   **Debt:** £99 - The debt is slightly higher than the savings.
+*   **Savings:** £98 - Savings are a bit lower than the debt.
+
+**Overall Assessment:**
+
+Based on this limited information, the individual is living close to the line. The debt is slightly higher than savings, and the salary seems very low. A more detailed analysis would require knowing the time period for the salary (weekly, monthly, annually), the interest rates on the debt, and living expenses.
+
+User 1 analysis:
+Tool search_tool failed: Error: ToolHardError('TAVILY_API_KEY is required to use search')
+ Please fix your mistakes.
+
+User 2 analysis:
+Okay, I will analyze the financial data. With a salary of £88, debt of £99, and savings of £98, the overall financial situation appears precarious. The debt exceeds the salary, which suggests potential cash flow problems. While the savings are significant, they are only slightly higher than the debt. This individual is likely living paycheck to paycheck and vulnerable to financial shocks. Further analysis would require knowing the timeframe for the salary (e.g., per week, month, or year) and the interest rate and repayment terms for the debt.
+
+User 3 analysis:
+87.0
+
+User 4 analysis:
+87.0
+
+User 5 analysis:
+87.0
+>>>>>>> c40dded1a219228bc2496ca3270c16f3075d1b2d
 
