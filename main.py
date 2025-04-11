@@ -33,11 +33,18 @@ def save_user_number(number):
 def save_to_csv(data):
     file_exists = os.path.isfile("financial_data.csv")
     with open("financial_data.csv", "a", newline="") as csvfile:
-        fieldnames = ['user', 'salary', 'debt', 'savings']
+        fieldnames = ['user', 'salary', 'debt', 'savings', 'dti', 'savings_rate', 'net_worth']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         if not file_exists:
             writer.writeheader()
         writer.writerow(data)
+
+def calculate_financial_metrics(salary, debt, savings):
+    """Calculate all financial metrics locally"""
+    dti = round((debt/salary)*100, 2) if salary else 0
+    savings_rate = round((savings/salary)*100, 2) if salary else 0
+    net_worth = savings - debt
+    return dti, savings_rate, net_worth
 
 @app.route('/')
 def index():
@@ -56,28 +63,35 @@ def submit():
         user_number = get_next_user_number()
         save_user_number(user_number)
 
+        # Calculate metrics locally
+        dti, savings_rate, net_worth = calculate_financial_metrics(salary, debt, savings)
+
         financial_data = {
             'user': user_number,
             'salary': salary,
             'debt': debt,
-            'savings': savings
+            'savings': savings,
+            'dti': dti,
+            'savings_rate': savings_rate,
+            'net_worth': net_worth
         }
         save_to_csv(financial_data)
 
-        # Shorter AI prompt
+        # Only ask AI for personalized advice
         prompt = f"""
-        Calculate these financial metrics for someone with:
-        - Salary: ${salary}
-        - Debt: ${debt}
-        - Savings: ${savings}
+        Based on these exact financial numbers:
+        Salary=${salary}, Debt=${debt}, Savings=${savings}, DTI={dti}%, SavingsRate={savings_rate}%, NetWorth=${net_worth}
 
-        1. Debt-to-Income Ratio (monthly debt payments/monthly income)
-        2. Savings Rate (savings/income)
-        3. Net Worth (savings - debt)
+        Output exactly 3 suggestions following these rules:
+        1. Each suggestion must begin with "1. ", "2. ", "3. " exactly
+        2. Use only plain text - no bold, italics, underline, or any formatting
+        3. Each suggestion must reference specific numbers from above
+        4. Maximum 15 words per suggestion
+        5. No introductory/closing sentences
+        6. No explanations or commentary
+        7. No blank lines between items
 
-        Then provide 2-3 practical suggestions to improve their finances.
-        Your answer will be used purely as output on a website for analysis therefore do not answer
-        regarding me.
+        Now provide exactly 3 suggestions for this case:
         """
 
         # Configure Gemini
@@ -91,35 +105,40 @@ def submit():
         
         try:
             plan_run = portia.run(prompt)
-            result = plan_run.outputs.final_output.value
+            advice = plan_run.outputs.final_output.value
+            if isinstance(advice, list):
+                advice = " ".join(advice)
         except Exception as e:
-            # Fallback calculations if API fails
-            dti = round((debt/salary)*100, 2) if salary else 0
-            savings_rate = round((savings/salary)*100, 2) if salary else 0
-            net_worth = savings - debt
-            result = f"Could not generate AI analysis due to API limits. Basic calculations:\n\n" \
-                     f"1. Debt-to-Income: {dti}%\n" \
-                     f"2. Savings Rate: {savings_rate}%\n" \
-                     f"3. Net Worth: ${net_worth}\n\n" \
-                     f"Suggestions: 1) Pay down high-interest debt first 2) Build emergency fund 3) Increase income streams"
+            advice = "1. Pay down high-interest debt first\n" \
+                    "2. Build an emergency fund (3-6 months of expenses)\n" \
+                    "3. Consider additional income streams"
 
-        if isinstance(result, list):
-            result = " ".join(result)
-
-        formatted_result = "<p>" + result.replace('\n', '</p><p>') + "</p>"
+        formatted_advice = "<p>" + advice.replace('\n', '</p><p>') + "</p>"
 
         with open("output.txt", "a") as f:
-            f.write(f"User {user_number} analysis:\n{result}\n\n")
+            f.write(f"User {user_number} analysis:\n"
+                   f"DTI: {dti}%, Savings Rate: {savings_rate}%, Net Worth: ${net_worth}\n"
+                   f"Advice: {advice}\n\n")
 
         return f"""
             <div style="font-family: Arial; max-width: 500px; margin: 0 auto;">
-                <h2>Data received for User {user_number}!</h2>
-                <p><strong>Salary:</strong> ${salary}</p>
-                <p><strong>Debt:</strong> ${debt}</p>
-                <p><strong>Savings:</strong> ${savings}</p>
-                <p><strong>Analysis:</strong></p>
-                <div style="background-color: #f1f1f1; padding: 10px; border-radius: 5px;">{formatted_result}</div>
-                <p>Results saved to files.</p>
+                <h2>Financial Analysis for User {user_number}</h2>
+                <div style="margin-bottom: 20px;">
+                    <p><strong>Salary:</strong> ${salary:,.2f}</p>
+                    <p><strong>Debt:</strong> ${debt:,.2f}</p>
+                    <p><strong>Savings:</strong> ${savings:,.2f}</p>
+                </div>
+                <div style="margin-bottom: 20px; background-color: #f0f8ff; padding: 10px; border-radius: 5px;">
+                    <h3>Calculated Metrics:</h3>
+                    <p><strong>Debt-to-Income Ratio:</strong> {dti}%</p>
+                    <p><strong>Savings Rate:</strong> {savings_rate}%</p>
+                    <p><strong>Net Worth:</strong> ${net_worth:,.2f}</p>
+                </div>
+                <div style="background-color: #f1f1f1; padding: 10px; border-radius: 5px;">
+                    <h3>Personalized Advice:</h3>
+                    {formatted_advice}
+                </div>
+                <p style="margin-top: 20px;">Results saved to files.</p>
                 <a href="/" style="display: inline-block; margin-top: 20px; padding: 10px; background: #4CAF50; color: white; text-decoration: none;">Submit Another</a>
             </div>
         """
