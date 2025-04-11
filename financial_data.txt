@@ -18,3 +18,8 @@ User 7:
   debt: 234
   savings: 34
 
+User 8:
+  salary: 11
+  debt: 11
+  savings: 11
+

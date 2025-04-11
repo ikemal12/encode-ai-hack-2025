@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template, send_from_directory
 import os
+import csv
 from dotenv import load_dotenv
 from portia import (
     Config,
@@ -26,6 +27,20 @@ def get_next_user_number():
 def save_user_number(number):
     with open("user_counter.txt", "w") as f:
         f.write(str(number))
+
+# Function to save data to CSV
+def save_to_csv(data):
+    file_exists = os.path.isfile("financial_data.csv")
+    
+    with open("financial_data.csv", "a", newline="") as csvfile:
+        fieldnames = ['user', 'salary', 'debt', 'savings']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        # Write headers only if the file does not exist
+        if not file_exists:
+            writer.writeheader()
+        
+        writer.writerow(data)
 
 @app.route('/')
 def index():
@@ -54,13 +69,8 @@ def submit():
             'savings': savings
         }
         
-        # Append to file (creates file if doesn't exist)
-        with open("financial_data.txt", "a") as f:
-            f.write(f"User {user_number}:\n")
-            for key, value in financial_data.items():
-                if key != 'user':  # Skip user as we already wrote it
-                    f.write(f"  {key}: {value}\n")
-            f.write("\n")  # Add spacing between entries
+        # Save data to CSV
+        save_to_csv(financial_data)
         
         # Initialize Portia
         google_config = Config.from_default(
@@ -74,6 +84,7 @@ def submit():
         plan_run = portia.run(f'Analyze financial data: Salary {salary}, Debt {debt}, Savings {savings}')
         final_output_value = plan_run.outputs.final_output.value
         
+        # Append output to file
         with open("output.txt", "a") as f:
             f.write(f"User {user_number} analysis:\n{final_output_value}\n\n")
         
