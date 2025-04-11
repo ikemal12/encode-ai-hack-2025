@@ -1,0 +1,20 @@
+User 4:
+  salary: £53636
+  debt: £64646
+  savings: £447
+
+User 5:
+  salary: £22
+  debt: £22
+  savings: £22
+
+User 6:
+  salary: 333
+  debt: 333
+  savings: 33
+
+User 7:
+  salary: 345
+  debt: 234
+  savings: 34
+
