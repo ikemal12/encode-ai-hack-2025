@@ -19,6 +19,10 @@ google_config = Config.from_default(
 )
 # Instantiate a Portia instance. Load it with the config and with the example tools.
 portia = Portia(config=google_config, tools=example_tool_registry)
-# Run the test query and print the output!
 plan_run = portia.run('add 1 + 2')
-print(plan_run.model_dump_json(indent=2))
+final_output_value = plan_run.outputs.final_output.value
+
+with open("output.txt", "w") as f:
+    f.write(f"{final_output_value}\n")
+
+print("Output written to output.txt")
