@@ -33,7 +33,7 @@ def save_to_csv(data):
     file_exists = os.path.isfile("financial_data.csv")
     
     with open("financial_data.csv", "a", newline="") as csvfile:
-        fieldnames = ['user', 'salary', 'debt', 'savings']
+        fieldnames = ['user', 'salary', 'debt', 'savings', 'credit_score']  # Add 'credit_score'
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         # Write headers only if the file does not exist
@@ -41,6 +41,51 @@ def save_to_csv(data):
             writer.writeheader()
         
         writer.writerow(data)
+
+# Function to calculate estimated credit score
+def estimate_credit_score(salary, savings, debt):
+    # Calculate Debt-to-Income (DTI) ratio
+    dti = debt / salary if salary != 0 else 0
+
+    # Calculate Savings-to-Income ratio
+    savings_to_income = savings / salary if salary != 0 else 0
+
+    # Base score for average individuals
+    base_score = 650
+
+    # Modify score based on DTI
+    if dti > 0.4:
+        base_score -= 100  # High debt-to-income ratio decreases score
+    elif dti > 0.2:
+        base_score -= 50  # Moderate DTI decrease
+
+    # Modify score based on Savings-to-Income
+    if savings_to_income > 0.2:
+        base_score += 50  # High savings increases score
+    elif savings_to_income > 0.1:
+        base_score += 25  # Moderate savings increases score
+
+    # Ensure the score stays within a reasonable range (300 to 850)
+    estimated_score = max(300, min(base_score, 850))
+
+    return estimated_score
+
+# Function to read data from CSV and prepare the query
+def read_and_prepare_csv_query():
+    query_list = []
+
+    # Read the financial data from the CSV
+    with open("financial_data.csv", "r") as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            salary = row['salary']
+            debt = row['debt']
+            savings = row['savings']
+            # Prepare the query for Gemini
+            query = f"Analyze financial data: Salary: £{salary}, Debt: £{debt}, Savings: £{savings}."
+            query_list.append(query)
+    
+    return query_list
 
 @app.route('/')
 def index():
@@ -61,12 +106,21 @@ def submit():
         user_number = get_next_user_number()
         save_user_number(user_number)
         
+        # Convert input values to floats
+        salary = float(salary)
+        debt = float(debt)
+        savings = float(savings)
+        
+        # Estimate the credit score
+        credit_score = estimate_credit_score(salary, savings, debt)
+        
         # Store in variables
         financial_data = {
             'user': user_number,
             'salary': salary,
             'debt': debt,
-            'savings': savings
+            'savings': savings,
+            'credit_score': credit_score  # Add credit score to data
         }
         
         # Save data to CSV
@@ -80,20 +134,28 @@ def submit():
         )
         portia = Portia(config=google_config, tools=example_tool_registry)
         
-        # Use the financial data
-        plan_run = portia.run(f'Analyze financial data: Salary {salary}, Debt {debt}, Savings {savings}')
-        final_output_value = plan_run.outputs.final_output.value
-        
-        # Append output to file
+        # Read and prepare the query for Gemini from the CSV data
+        queries = read_and_prepare_csv_query()
+
+        # Send each query to Portia (Gemini model)
+        analysis_results = []
+        for query in queries:
+            plan_run = portia.run(query)
+            final_output_value = plan_run.outputs.final_output.value
+            analysis_results.append(final_output_value)
+
+        # Store analysis in output.txt
         with open("output.txt", "a") as f:
-            f.write(f"User {user_number} analysis:\n{final_output_value}\n\n")
-        
+            for i, result in enumerate(analysis_results):
+                f.write(f"User {i + 1} analysis:\n{result}\n\n")
+
         return f"""
             <div style="font-family: Arial; max-width: 500px; margin: 0 auto;">
                 <h2>Data received for User {user_number}!</h2>
                 <p><strong>Salary:</strong> {salary}</p>
                 <p><strong>Debt:</strong> {debt}</p>
                 <p><strong>Savings:</strong> {savings}</p>
+                <p><strong>Estimated Credit Score:</strong> {credit_score}</p>
                 <p>Results appended to files.</p>
                 <a href="/" style="display: inline-block; margin-top: 20px; padding: 10px; background: #4CAF50; color: white; text-decoration: none;">Submit Another</a>
             </div>
