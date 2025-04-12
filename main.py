@@ -78,18 +78,25 @@ def submit():
         }
         save_to_csv(financial_data)
 
-        # AI prompt
         prompt = f"""
-        Based on these exact financial numbers:
-        Salary=${salary}, Debt=${debt}, Savings=${savings}, DTI={dti}%, SavingsRate={savings_rate}%, NetWorth=${net_worth}
+        The following financial metrics have already been calculated and verified, so do not recalculate them. Use them directly for analysis and advice:
 
-        Calculate their:
-        1. Debt-to-Income Ratio (DTI)
-        2. Savings Rate
-        3. Net Worth
+        - Salary: £{salary}
+        - Debt: £{debt}
+        - Savings: £{savings}
+        - Debt-to-Income Ratio (DTI): {dti}%
+        - Savings Rate: {savings_rate}%
+        - Net Worth: £{net_worth}
 
-        Then provide a short paragraph interpreting these values and giving practical suggestions to improve their financial situation.
-        """
+        Output exactly 3 suggestions following these rules:
+        1. Each suggestion must begin with "1. ", "2. ", "3. " exactly
+        2. Use only plain text - no bold, italics, underline, or any formatting
+        3. Each suggestion must reference specific numbers from above
+        4. Maximum 15 words per suggestion
+        5. No introductory/closing sentences
+        6. No explanations or commentary
+        7. No blank lines between items       
+          """
 
         # Model switching logic
         if model_choice == "gemini":
@@ -125,15 +132,15 @@ def submit():
             <div style="font-family: Arial; max-width: 500px; margin: 0 auto;">
                 <h2>Financial Analysis for User {user_number}</h2>
                 <div style="margin-bottom: 20px;">
-                    <p><strong>Salary:</strong> ${salary:,.2f}</p>
-                    <p><strong>Debt:</strong> ${debt:,.2f}</p>
-                    <p><strong>Savings:</strong> ${savings:,.2f}</p>
+                    <p><strong>Salary:</strong> £{salary:,.2f}</p>
+                    <p><strong>Debt:</strong> £{debt:,.2f}</p>
+                    <p><strong>Savings:</strong> £{savings:,.2f}</p>
                 </div>
                 <div style="margin-bottom: 20px; background-color: #f0f8ff; padding: 10px; border-radius: 5px;">
                     <h3>Calculated Metrics:</h3>
                     <p><strong>Debt-to-Income Ratio:</strong> {dti}%</p>
                     <p><strong>Savings Rate:</strong> {savings_rate}%</p>
-                    <p><strong>Net Worth:</strong> ${net_worth:,.2f}</p>
+                    <p><strong>Net Worth:</strong> £{net_worth:,.2f}</p>
                 </div>
                 <div style="background-color: #f1f1f1; padding: 10px; border-radius: 5px;">
                     <h3>Personalized Advice:</h3>
