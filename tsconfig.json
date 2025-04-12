@@ -1,18 +1,17 @@
 {
-    "compilerOptions": {
-      "target": "ES6",                   // Target modern JavaScript
-      "module": "ES6",                   // Use ES6 modules
-      "strict": true,                    // Enable strict mode for better type checking
-      "esModuleInterop": true,           // Enable interoperability between CommonJS and ES modules
-      "outDir": "./public/js",           // Output compiled JavaScript to the "public/js" folder
-      "rootDir": "./frontend/ts",        // Source files are in "frontend/ts"
-      "skipLibCheck": true               // Skip type checking for declaration files (speeds up compilation)
-    },
-    "include": [
-      "frontend/ts/**/*"  // Include all files in the "frontend/ts" folder
-    ],
-    "exclude": [
-      "node_modules"
-    ]
-  }
-  
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "ES6",
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "./public/js",
+    "rootDir": "./frontend/ts",
+    "skipLibCheck": true
+  },
+  "include": [
+    "frontend/ts/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
