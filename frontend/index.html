@@ -23,7 +23,8 @@
       margin-top: 15px;
       font-weight: bold;
     }
-    input[type="number"] {
+    input[type="number"],
+    select {
       width: 100%;
       padding: 10px;
       margin-top: 5px;
@@ -66,6 +67,12 @@
 
       <label for="savings">Savings (£):</label>
       <input type="number" id="savings" name="savings" placeholder="Enter your total savings" required />
+
+      <label for="model">Choose Model:</label>
+      <select id="model" name="model">
+        <option value="gemini" selected>Gemini</option>
+        <option value="gpt">GPT-3.5</option>
+      </select>
 
       <button type="submit">Estimate Credit Score</button>
     </form>
