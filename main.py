@@ -16,6 +16,7 @@ load_dotenv()
 app = Flask(__name__, template_folder='frontend', static_folder='frontend')
 
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 # User ID counter
 def get_next_user_number():
@@ -64,6 +65,8 @@ def submit():
         user_number = get_next_user_number()
         save_user_number(user_number)
 
+        dti, savings_rate, net_worth = calculate_financial_metrics(salary, debt, savings)
+
         financial_data = {
             'user': user_number,
             'salary': salary,
@@ -88,12 +91,23 @@ def submit():
         Then provide a short paragraph interpreting these values and giving practical suggestions to improve their financial situation.
         """
 
-        # Configure Gemini
-        config = Config.from_default(
-            llm_provider=LLMProvider.GOOGLE_GENERATIVE_AI,
-            llm_model_name=LLMModel.GEMINI_2_0_FLASH,
-            google_api_key=GOOGLE_API_KEY
-        )
+        # Model switching logic
+        if model_choice == "gemini":
+            # Configure Gemini
+            config = Config.from_default(
+                llm_provider=LLMProvider.GOOGLE_GENERATIVE_AI,
+                llm_model_name=LLMModel.GEMINI_2_0_FLASH,
+                google_api_key=GOOGLE_API_KEY
+            )
+        elif model_choice == "gpt":
+            # Configure GPT (OpenAI)
+            config = Config.from_default(
+                llm_provider=LLMProvider.OPENAI,
+                llm_model_name=LLMModel.GPT_3_5_TURBO,
+                openai_api_key=OPENAI_API_KEY
+            )
+        else:
+            return "Invalid model choice", 400
 
         portia = Portia(config=config, tools=[])  # No search tools
         plan_run = portia.run(prompt)
@@ -102,7 +116,7 @@ def submit():
         if isinstance(result, list):
             result = " ".join(result)
 
-        formatted_advice = "<p>" + advice.replace('\n', '</p><p>') + "</p>"
+        formatted_advice = "<p>" + result.replace('\n', '</p><p>') + "</p>"
 
         with open("output.txt", "a") as f:
             f.write(f"User {user_number} analysis:\n{result}\n\n")
