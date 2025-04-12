@@ -64,8 +64,6 @@ def submit():
         user_number = get_next_user_number()
         save_user_number(user_number)
 
-        dti, savings_rate, net_worth = calculate_financial_metrics(salary, debt, savings)
-
         financial_data = {
             'user': user_number,
             'salary': salary,
@@ -77,54 +75,37 @@ def submit():
         }
         save_to_csv(financial_data)
 
+        # AI prompt
         prompt = f"""
         Based on these exact financial numbers:
         Salary=${salary}, Debt=${debt}, Savings=${savings}, DTI={dti}%, SavingsRate={savings_rate}%, NetWorth=${net_worth}
 
-        Output exactly 3 suggestions following these rules:
-        1. Each suggestion must begin with "1. ", "2. ", "3. " exactly
-        2. Use only plain text - no bold, italics, underline, or any formatting
-        3. Each suggestion must reference specific numbers from above
-        4. Maximum 15 words per suggestion
-        5. No introductory/closing sentences
-        6. No explanations or commentary
-        7. No blank lines between items
+        Calculate their:
+        1. Debt-to-Income Ratio (DTI)
+        2. Savings Rate
+        3. Net Worth
 
-        Now provide exactly 3 suggestions for this case:
+        Then provide a short paragraph interpreting these values and giving practical suggestions to improve their financial situation.
         """
 
-        # Dynamic Model Switching
-        if model_choice == "gpt":
-            config = Config.from_default(
-                llm_provider=LLMProvider.OPENAI,
-                llm_model_name=LLMModel.GPT_3_5_TURBO,
-                openai_api_key=os.getenv("OPENAI_API_KEY")
-            )
-        else:
-            config = Config.from_default(
-                llm_provider=LLMProvider.GOOGLE_GENERATIVE_AI,
-                llm_model_name=LLMModel.GEMINI_2_0_FLASH,
-                google_api_key=os.getenv("GOOGLE_API_KEY")
-            )
+        # Configure Gemini
+        config = Config.from_default(
+            llm_provider=LLMProvider.GOOGLE_GENERATIVE_AI,
+            llm_model_name=LLMModel.GEMINI_2_0_FLASH,
+            google_api_key=GOOGLE_API_KEY
+        )
 
-        portia = Portia(config=config, tools=[])
+        portia = Portia(config=config, tools=[])  # No search tools
+        plan_run = portia.run(prompt)
+        result = plan_run.outputs.final_output.value
 
-        try:
-            plan_run = portia.run(prompt)
-            advice = plan_run.outputs.final_output.value
-            if isinstance(advice, list):
-                advice = " ".join(advice)
-        except Exception:
-            advice = "1. Pay down high-interest debt first\n" \
-                     "2. Build an emergency fund (3-6 months of expenses)\n" \
-                     "3. Consider additional income streams"
+        if isinstance(result, list):
+            result = " ".join(result)
 
         formatted_advice = "<p>" + advice.replace('\n', '</p><p>') + "</p>"
 
         with open("output.txt", "a") as f:
-            f.write(f"User {user_number} analysis:\n"
-                    f"DTI: {dti}%, Savings Rate: {savings_rate}%, Net Worth: ${net_worth}\n"
-                    f"Advice: {advice}\n\n")
+            f.write(f"User {user_number} analysis:\n{result}\n\n")
 
         return f"""
             <div style="font-family: Arial; max-width: 500px; margin: 0 auto;">
