@@ -18,6 +18,11 @@
   "homepage": "https://github.com/ikemal12/encode-ai-hack-2025#readme",
   "description": "",
   "devDependencies": {
+    "@types/firebase": "^2.4.32",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@types/node": "^22.14.1",
+    "firebase": "^11.6.0"
   }
 }
