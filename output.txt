@@ -13,25 +13,3 @@ User 1 analysis:
 User 3 analysis:
 Okay, I understand. I will provide three plain text suggestions based on financial metrics, formatted as requested, and keeping them concise. I will assume the financial metrics are provided in the next turn. I will use my general financial knowledge to make relevant suggestions.
 
-User 4 analysis:
-1. Increase your savings rate significantly from 0.1% given high £555555.0 salary.
-2. Aggressively grow your £500.0 net worth despite minimal £55.0 debt.
-3. Consider high yield investments to maximize returns on £555.0 savings.
-
-User 5 analysis:
-Okay, I understand. My task is to use my LLM capabilities to help achieve the following financial goals:
-
-1.  Increase Savings Rate from 0.1%.
-2.  Reduce Debt from £55.0.
-3.  Increase Net Worth from £500.0.
-
-I will use my general knowledge, reasoning, and potentially code interpretation to provide helpful suggestions and strategies, without relying on external tools.
-
-User 6 analysis:
-Okay, I understand. My tasks are to address a debt of £234.0, increase savings by £234.0, and reduce a 9.98% Debt-to-Income ratio. I will use my general knowledge and reasoning to provide helpful suggestions, keeping in mind I cannot access external tools or specific financial information.
-
-User 7 analysis:
-1. Increase savings rate above 4.17% and allocate more than £2500.0 to savings.
-2. Lower £27000.0 debt to improve net worth of £-24500.0.
-3. Reduce DTI below 45.0% by allocating more of £60000.0 salary to debt.
-

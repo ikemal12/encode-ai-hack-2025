@@ -1,5 +1,4 @@
 from flask import Flask, request, render_template, send_from_directory
-from flask_cors import CORS  # Add this import at the top
 import os
 import csv
 from dotenv import load_dotenv
@@ -14,11 +13,7 @@ from portia import (
 # Load environment variables
 load_dotenv()
 
-# In main.py, modify the static folder configuration
-app = Flask(__name__, 
-            template_folder='frontend',
-            static_folder='frontend')  # Points to frontend folder
-CORS(app)  # Add this line to enable CORS if your frontend is on a different port
+app = Flask(__name__, template_folder='frontend', static_folder='frontend')
 
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
@@ -84,7 +79,7 @@ def submit():
         save_to_csv(financial_data)
 
         prompt = f"""
-        You are a financial assistant. The following financial metrics have already been calculated. Do not recalculate.
+        The following financial metrics have already been calculated and verified, so do not recalculate them. Use them directly for analysis and advice:
 
         - Salary: £{salary}
         - Debt: £{debt}
@@ -93,20 +88,15 @@ def submit():
         - Savings Rate: {savings_rate}%
         - Net Worth: £{net_worth}
 
-        Your task is to provide exactly 3 financial improvement suggestions using the metrics above.
-
-        Strict rules:
-        1. Each suggestion must begin with: "1. ", "2. ", "3. " (exactly like that)
-        2. Use only plain text (no formatting)
-        3. Each suggestion must include at least one number from the metrics above
+        Output exactly 3 suggestions following these rules:
+        1. Each suggestion must begin with "1. ", "2. ", "3. " exactly
+        2. Use only plain text - no bold, italics, underline, or any formatting
+        3. Each suggestion must reference specific numbers from above
         4. Maximum 15 words per suggestion
-        5. DO NOT include any introduction or closing
-        6. DO NOT explain anything
-        7. DO NOT leave blank lines
-
-        Respond ONLY with the 3 numbered suggestions. Nothing else.
-        """
-
+        5. No introductory/closing sentences
+        6. No explanations or commentary
+        7. No blank lines between items       
+          """
 
         # Model switching logic
         if model_choice == "gemini":
