@@ -6,31 +6,17 @@
   <title>Credit Score Estimator - Encode Hackathon</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f5f5f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: #333;
+      font-family: Arial, sans-serif;
+      margin: 50px;
+      background-color: #f9f9f9;
     }
     .container {
-      max-width: 500px;
-      width: 100%;
-      background-color: #ffffff;
-      padding: 40px;
+      max-width: 400px;
+      margin: auto;
+      padding: 30px;
+      background-color: white;
       border-radius: 8px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease;
-    }
-    .container:hover {
-      transform: scale(1.02);
-    }
-    h2 {
-      text-align: center;
-      color: #4CAF50;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     label {
       display: block;
@@ -40,44 +26,31 @@
     input[type="number"],
     select {
       width: 100%;
-      padding: 12px;
-      margin-top: 8px;
-      margin-bottom: 15px;
+      padding: 10px;
+      margin-top: 5px;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 4px;
       box-sizing: border-box;
-      font-size: 16px;
     }
     button {
+      margin-top: 20px;
+      padding: 10px;
       width: 100%;
-      padding: 14px;
       background-color: #4CAF50;
       color: white;
       border: none;
-      border-radius: 5px;
-      font-size: 18px;
+      border-radius: 4px;
+      font-size: 16px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
     }
     button:hover {
       background-color: #45a049;
     }
-    .form-group {
-      margin-bottom: 20px;
-    }
     #result {
-      margin-top: 25px;
-      padding: 20px;
-      background-color: #f2f2f2;
-      border-radius: 8px;
-      display: none; /* Hidden by default */
+      margin-top: 20px;
       font-size: 18px;
       font-weight: bold;
-      text-align: center;
-    }
-    .error {
-      color: #d9534f;
-      font-size: 14px;
+      color: #333;
     }
   </style>
 </head>
@@ -85,37 +58,30 @@
   <div class="container">
     <h2>Credit Score Estimator</h2>
     
-    <form id="credit-score-form">
-      <div class="form-group">
-        <label for="salary">Annual Salary (£):</label>
-        <input type="number" id="salary" name="salary" placeholder="Enter your salary" required />
-      </div>
+    <form action="/submit" method="post">
+      <label for="salary">Annual Salary (£):</label>
+      <input type="number" id="salary" name="salary" placeholder="Enter your salary" required />
 
-      <div class="form-group">
-        <label for="debt">Total Debt (£):</label>
-        <input type="number" id="debt" name="debt" placeholder="Enter your total debt" required />
-      </div>
+      <label for="debt">Total Debt (£):</label>
+      <input type="number" id="debt" name="debt" placeholder="Enter your total debt" required />
 
-      <div class="form-group">
-        <label for="savings">Savings (£):</label>
-        <input type="number" id="savings" name="savings" placeholder="Enter your total savings" required />
-      </div>
+      <label for="savings">Savings (£):</label>
+      <input type="number" id="savings" name="savings" placeholder="Enter your total savings" required />
 
-      <div class="form-group">
-        <label for="model">Choose Model:</label>
-        <select id="model" name="model">
-          <option value="gemini" selected>Gemini</option>
-          <option value="gpt">GPT-3.5</option>
-        </select>
-      </div>
+      <label for="model">Choose Model:</label>
+      <select id="model" name="model">
+        <option value="gemini" selected>Gemini</option>
+        <option value="gpt">GPT-3.5</option>
+      </select>
 
       <button type="submit">Estimate Credit Score</button>
     </form>
 
+    <a href="login.html">Go to Login</a>
+
     <div id="result"></div>
   </div>
 
-<!-- Change this line in index.html -->
-<script src="/static/js/app.js"></script>
+  <script src="js/app.js"></script>  <!-- Link to the compiled JavaScript file -->
 </body>
 </html>
